@@ -12,7 +12,7 @@ while read line; do
   export distro=$(echo "$line" | awk -F, '{ print $4 }')
   touch "docker-compose/docker-compose-${shortname}.yml"
   echo "Generating docker-compose-${shortname}.yml (${gamename})"
-  j2 -f env docker-compose.yml.j2 >"docker-compose/docker-compose-${shortname}.yml"
+  ./j2render.py docker-compose.yml.j2 >"docker-compose/docker-compose-${shortname}.yml"
   echo -n "{" >>"shortnamearray.json"
   echo -n "\"shortname\":" >>"shortnamearray.json"
   echo -n "\"${shortname}\"" >>"shortnamearray.json"

@@ -12,7 +12,7 @@ while read line; do
   export distro=$(echo "$line" | awk -F, '{ print $4 }')
   touch "dockerfiles/Dockerfile.${shortname}"
   echo "Generating Dockerfile.${shortname} (${gamename})"
-  j2 -f env Dockerfile.j2 >"dockerfiles/Dockerfile.${shortname}"
+  ./j2render.py Dockerfile.j2 >"dockerfiles/Dockerfile.${shortname}"
   echo -n "{" >>"shortnamearray.json"
   echo -n "\"shortname\":" >>"shortnamearray.json"
   echo -n "\"${shortname}\"" >>"shortnamearray.json"
