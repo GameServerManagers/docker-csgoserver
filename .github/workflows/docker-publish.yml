@@ -118,7 +118,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v6.10.0
+        uses: docker/build-push-action@v6.13.0
         with:
           context: .
           file: dockerfiles/Dockerfile.${{ matrix.shortname }}
