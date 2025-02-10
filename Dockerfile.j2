@@ -8,6 +8,12 @@ FROM ghcr.io/gameservermanagers/linuxgsm:{{ distro }}
 LABEL maintainer="LinuxGSM <me@danielgibbs.co.uk>"
 ARG SHORTNAME={{ shortname }}
 ENV GAMESERVER={{ shortname }}server
+# Default cron schedules (can be overridden in docker-compose)
+ENV MONITOR_CRON="*/5 * * * *"
+ENV UPDATE_CRON="*/30 * * * *"
+ENV FORCE_UPDATE_CRON="30 4 * * *"
+ENV UPDATE_LGSM_CRON="0 0 * * 0"
+ENV BACKUP_CRON="0 5 * * *"
 
 WORKDIR /app
 
@@ -16,11 +22,24 @@ RUN depshortname=$(curl --connect-timeout 10 -s https://raw.githubusercontent.co
   && if [ -n "${depshortname}" ]; then \
   echo "**** Install ${depshortname} ****" \
   && apt-get update \
-  && apt-get install -y ${depshortname} \
+  && apt-get install -y ${depshortname} cron \
   && apt-get -y autoremove \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*; \
   fi
+
+# Set up cron jobs dynamically based on environment variables
+RUN echo "Setting up cron jobs" \
+&& echo "$MONITOR_CRON /app/$GAMESERVER monitor > /dev/null 2>&1" >> /etc/crontab \
+&& echo "$UPDATE_CRON /app/$GAMESERVER update > /dev/null 2>&1" >> /etc/crontab \
+&& echo "$FORCE_UPDATE_CRON /app/$GAMESERVER force-update > /dev/null 2>&1" >> /etc/crontab \
+&& echo "$UPDATE_LGSM_CRON /app/$GAMESERVER update-lgsm > /dev/null 2>&1" >> /etc/crontab \
+&& echo "$BACKUP_CRON /app/$GAMESERVER backup > /dev/null 2>&1" >> /etc/crontab \
+&& chmod 0644 /etc/crontab \
+&& crontab /etc/crontab
+
+# Run cron in the background
+RUN service cron start
 
 HEALTHCHECK --interval=1m --timeout=1m --start-period=2m --retries=1 CMD /app/entrypoint-healthcheck.sh || exit 1
 

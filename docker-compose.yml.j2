@@ -5,6 +5,13 @@ services:
     image: gameservermanagers/gameserver:{{ shortname }}
     # image: ghcr.io/gameservermanagers/gameserver:{{ shortname }}
     container_name: {{ shortname }}server
+    environment:
+    # Cron job environment variables
+      MONITOR_CRON: "*/5 * * * *"
+      UPDATE_CRON: "*/30 * * * *"
+      FORCE_UPDATE_CRON: "30 4 * * *"
+      UPDATE_LGSM_CRON: "0 0 * * 0"
+      BACKUP_CRON: "0 5 * * *"
     restart: unless-stopped
     volumes:
       - /path/to/linuxgsm/{{ shortname }}server:/data
@@ -15,6 +22,13 @@ services:
     image: gameservermanagers/gameserver:{{ shortname }}
     # image: ghcr.io/gameservermanagers/gameserver:{{ shortname }}
     container_name: {{ shortname }}server
+    environment:
+    # Cron job environment variables
+      MONITOR_CRON: "*/5 * * * *"
+      UPDATE_CRON: "*/30 * * * *"
+      FORCE_UPDATE_CRON: "30 4 * * *"
+      UPDATE_LGSM_CRON: "0 0 * * 0"
+      BACKUP_CRON: "0 5 * * *"
     restart: unless-stopped
     volumes:
       - linuxgsm-{{ shortname }}:/data
